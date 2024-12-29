@@ -1,0 +1,22 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: contactuiappdeployment
+spec:
+ replicas: 1
+ selector:
+   matchLabels:
+     app: contactui
+ template:
+  metadata:
+   name: contactui
+   labels:
+     app: contactui
+  spec:
+    containers:
+    - name: contactuicontainer
+      image: vilasjdhv639/contact_ui_app:v1
+      ports:
+      - containerPort: 80
+...
