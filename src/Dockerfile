@@ -1,28 +1,33 @@
-# Stage 1: Compile and Build angular codebase
+# Stage 1: Compile and Build Angular codebase
 
-# Use official node image as the base image
-FROM node:latest as build
+# Use Node.js 16.20.2 as the base image
+FROM node:16.20.2 as build
 
-# Set the working directory
+# Set the working directory inside the container
 WORKDIR /usr/local/app
 
-# Add the source code to app
+# Copy the source code to the working directory
 COPY ./ /usr/local/app/
 
-# Install all the dependencies
+# Install the specific npm version (8.19.4)
+RUN npm install -g npm@8.19.4
+
+# Install all dependencies
 RUN npm install
 
-# Generate the build of the application
+# Build the Angular application
 RUN npm run build
 
+# Stage 2: Serve the app with an Nginx server
 
-# Stage 2: Serve app with nginx server
-
-# Use official nginx image as the base image
+# Use the official Nginx image as the base image
 FROM nginx:latest
 
-# Copy the build output to replace the default nginx contents.
-COPY --from=build /usr/local/app/dist/* /usr/share/nginx/html
+# Copy the build output from the previous stage to the Nginx HTML directory
+COPY --from=build /usr/local/app/dist /usr/share/nginx/html
 
-# Expose port 80
+# Expose port 80 to serve the application
 EXPOSE 80
+
+# Start Nginx server
+CMD ["nginx", "-g", "daemon off;"]
